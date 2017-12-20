@@ -1,7 +1,7 @@
 version: '3.1'
 
 services:
-  pg:
+  pg_dev:
     image: 'postgres:10.1-alpine'
     ports:
       - 54321:5432
@@ -11,9 +11,18 @@ services:
       POSTGRES_DB: 'fullstack_dev'
       PGDATA: '/var/lib/postgresql/data/pgdata'
     volumes:
-      - ./services/pg/pgdata:/var/lib/postgresql/data/pgdata
+      - ./services/pg_dev/pgdata:/var/lib/postgresql/data/pgdata
 
-  pgadmin:
-    image: 'chorss/docker-pgadmin4'
+  pg_test:
+    image: 'postgres:10.1-alpine'
     ports:
-      - 5050:5050
+      - 54322:5432
+    environment:
+      POSTGRES_USER: 'fullstack'
+      POSTGRES_PASSWORD: 'fullstack@123'
+      POSTGRES_DB: 'fullstack_test'
+
+  # pgadmin:
+  #   image: 'chorss/docker-pgadmin4'
+  #   ports:
+  #     - 5050:5050
