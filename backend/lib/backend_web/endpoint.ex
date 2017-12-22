@@ -7,6 +7,8 @@ defmodule BackendWeb.Endpoint do
   #
   # You should set gzip to true if you are running phoenix.digest
   # when deploying your static files in production.
+  #
+  # Adds an HTTP cache header so that the client knows that it doesn’t need to fetch them again
   plug Plug.Static,
     at: "/", from: :backend, gzip: false,
     only: ~w(css fonts images js favicon.ico robots.txt)
@@ -20,17 +22,34 @@ defmodule BackendWeb.Endpoint do
   plug Plug.RequestId
   plug Plug.Logger
 
+  # Parse the body of a request
+  # Here we get params from the request
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
     json_decoder: Poison
 
+  # Used to override the HTTP method
+  # Really needed?
   plug Plug.MethodOverride
+  
+  # Used to change the HEAD HTTP method to GET
+  # Really needed?
   plug Plug.Head
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
   # Set :encryption_salt if you would also like to encrypt it.
+  #
+  # Plug.Session can use 2 kinds of storing types: :cookie or :ets
+  #   Plug.Session.COOKIE is based on
+  #     Plug.Crypto.MessageEncryptor and Plug.Crypto.MessageVerifier.
+  #     Under the hood, it uses AES128-GCM algorithm
+  #
+  # This Plug is handy but you would probably use another plug for better
+  # and well-known secure session token generation strategies (like JWT).
+  #
+  # Phoenix.Token has some functions around tokens also.
   plug Plug.Session,
     store: :cookie,
     key: "_backend_key",
